@@ -1,0 +1,426 @@
+<html>
+<head>
+<script src="quintus-all.js"></script>
+<style type="text/css">
+	canvas {background-color:white;}
+    </style>
+</head>
+<body>
+	<!--
+	<canvas id="mygame" width='500' height='500'></canvas>
+	-->
+	<span id="score">Scores: 0</span>
+	<script type="text/javascript">
+		window.addEventListener("load",function(){
+			//ball
+			//var Q  = window.Q  = Quintus().include("Sprites").setup({maximize:"touch"});
+			//Q.MovingSprite.extend("Ball",{
+			//	draw:function(ctx){
+			//		ctx.fillStyle = "black";
+			//		ctx.beginPath();
+			//		ctx.arc(-this.p.cx,
+			//			-this.p.cy,
+			//			this.p.w/2,0,Math.PI*2);
+			//		ctx.fill();
+			//	}
+			//});
+
+			//var ball = window.ball = new Q.Ball({w:20,h:20,x:30,y:300,vx:30,vy:-100,ax:0,ay:30});
+
+			//Q.gameLoop(function(dt){
+			//	Q.clear();
+			//	ball.update(dt);
+			//	ball.render(Q.ctx);
+			//});
+
+			//sprite
+			//var Q = window.Q = Quintus().include("Sprites,Scenes,2D,Input").setup({height:600,width:1000});
+			//function drawlines(ctx){
+			//	ctx.save();
+			//	ctx.strokeStyle = "#FFFFFF";
+			//	for(var x = 0;x<1000;x+=100){
+			//		ctx.beginPath();
+			//		ctx.moveTo(x,0);
+			//		ctx.lineTo(x,600);
+			//		ctx.stroke();
+			//	}
+			//	ctx.restore();
+			//}
+			//Q.scene("start",function(stage){
+			//	var sprite1 = new Q.Sprite({x:500,y:100,asset:'enemy.png',angle:0,collisionMask:1,scale:1});
+			//	sprite1.p.points = [
+			//	[-150,-120],
+			//	[150,-120],
+			//	[150,60],
+			//	[90,120],
+			//	[-90,120],
+			//	[-150,60]
+			//	];
+			//	stage.insert(sprite1);
+			//	//动力学模型，sprite默认往下掉
+			//	sprite1.add('2d');
+			//	sprite1.on("step",function(){});
+			//	var sprite2 = new Q.Sprite({x:500,y:600,w:300,h:200});
+			//	sprite2.draw = function(ctx){
+			//		ctx.fillStyle = "#FF0000";
+			//		ctx.fillRect(-this.p.cx,-this.p.cy,this.p.w,this.p.h);
+			//	};
+			//	stage.insert(sprite2);
+			//	//按键控制
+			//	Q.input.on('up',stage,function(e) { 
+      		//		sprite1.p.scale -= 0.1;
+    		//	});
+    		//	Q.input.on('down',stage,function(e) { 
+      		//		sprite1.p.scale += 0.1;
+    		//	});
+    		//	Q.input.on('left',stage,function(e) {
+      		//		sprite1.p.angle -= 5;
+    		//	});
+    		//	Q.input.on('right',stage,function(e) {
+    		//	  sprite1.p.angle += 5;
+    		//	});
+    		//	//z
+    		//	Q.input.on('fire',stage,function(e) {
+    		//		console.log(sprite1.p.vx);
+			//		console.log(sprite1.p.vy);
+    		//	  sprite1.p.vy = -600;
+    		//	  //sprite1.p.x = 500;
+    		//	  //sprite1.p.y = 100;
+    		//	});
+    		//	//x
+    		//	Q.input.on('action',stage,function(e) {
+    		//	  sprite1.p.x = 500;
+    		//	  sprite1.p.y = 100;
+    		//	});
+			//	stage.on("postrender",drawlines);
+			//});
+			//Q.load('enemy.png',function(){
+			//	Q.stageScene("start");
+			//	Q.debug = true;
+			//	Q.input.keyboardControls();
+			//});
+
+			// # Quintus Touch and Drag Example
+  			//var Q = window.Q = Quintus().include("Sprites, Scenes, Input, Touch");
+  			//Q.setup({ maximize: true }).touch(Q.SPRITE_ALL);
+  			//Q.Sprite.extend("RandomShape", {
+     		//	init: function(p) {
+       		//	// Create a random shape (defined below)
+       		//	p =this.createShape(p);
+       		//	// Initialize the p hash
+       		//	this._super(p);
+       		//	// Listen for a drag events, sent by the
+       		//	// touch module
+       		//	this.on("drag");
+       		//	this.on("touchEnd");
+     		//	},
+     		//	drag: function(touch) {
+       		//		this.p.dragging = true;
+       		//		this.p.x = touch.origX + touch.dx;
+       		//		this.p.y = touch.origY + touch.dy;
+     		//	},
+     		//	touchEnd: function(touch) {
+       		//		this.p.dragging = false;
+     		//	},
+     		//	createShape: function(p) {
+        	//		var angle = Math.random()*2*Math.PI,
+            //		numPoints = 3 + Math.floor(Math.random()*5),
+            //		minX = 0, maxX = 0,
+            //		minY = 0, maxY = 0,
+            //		curX, curY;
+        	//		p = p || {};
+        	//		p.points = [];
+        	//		var startAmount = 40;
+        	//		for(var i = 0;i < numPoints;i++) {
+          	//			curX = Math.floor(Math.cos(angle)*startAmount);
+          	//			curY = Math.floor(Math.sin(angle)*startAmount);
+          	//			if(curX < minX) minX = curX;
+          	//			if(curX > maxX) maxX = curX;
+          	//			if(curY < minY) minY = curY;
+          	//			if(curY > maxY) maxY = curY;
+          	//			p.points.push([curX,curY]);
+          	//			startAmount += Math.floor(Math.random()*10);
+          	//			angle += (Math.PI * 2) / (numPoints+1);
+        	//		};
+        	//		maxX += 30;
+        	//		minX -= 30;
+        	//		maxY += 30;
+        	//		minY -= 30;
+        	//		p.w = maxX - minX;
+        	//		p.h = maxY - minY;
+        	//		for(var i = 0;i < numPoints;i++) {
+        	//		  p.points[i][0] -= minX + p.w/2;
+        	//		  p.points[i][1] -= minY + p.h/2;
+        	//		}
+        	//		p.x = Math.random()*Q.width;
+        	//		p.y = Math.random()*Q.height;
+        	//		p.cx = p.w/2;
+        	//		p.cy = p.h/2;
+        	//		p.angle = angle;
+        	//		p.type = 1;
+       		//		return p;
+     		//	},
+     		//	// If the mousemove event below sets the
+     		//	// hit variable, scale this sucker up a bit.
+     		//	//
+     		//	// Also move to avoid collisions with any other sprites
+     		//	step: function(dt) {
+     		//	  if(this.p.over) {
+     		//	    this.p.scale = 1.2;
+     		//	  } else {
+     		//	    this.p.scale = 1.;
+     		//	  }
+     		//	 var maxCol = 3, collided = false, p = this.p;
+     		//	 p.hit = false;
+     		//	 while((collided = this.stage.search(this)) && maxCol > 0) {
+     		//	   if(collided) {
+     		//	     // If we're dragging, move other objects
+     		//	     // otherwise, move us
+     		//	     if(this.p.dragging) { 
+     		//	       collided.obj.p.x += collided.separate[0];
+     		//	       collided.obj.p.y += collided.separate[1];
+     		//	     } else {
+     		//	       this.p.x -= collided.separate[0];
+     		//	       this.p.y -= collided.separate[1];
+     		//	     }
+     		//	   }
+     		//	   maxCol--;
+     		//	 }
+     		//	}
+  			//});
+  			//// Number of shapes to add to the page
+  			//var numShapes = 5;
+  			//// Scene that actually adds shapes onto the stage
+  			//Q.scene("start",new Q.Scene(function(stage) {
+    		//var shapesLeft = numShapes;
+    		//while(shapesLeft-- > 0) {
+      		//	stage.insert(new Q.RandomShape());
+    		//}
+  		//}));
+  		//// Finally call `stageScene` to start the show
+  		//Q.stageScene("start");
+  		//// Render the elements
+  		//// Turning Q.debug and Q.debugFill on will render
+  		//// the sprites' collision meshes, which is all we want
+  		//// in this situation, otherwise nothing would get rendered
+  		//Q.debug = true;
+  		//Q.debugFill = true;
+  		//var currentObj = null;
+  		//// Touch events do most of the work for us, but the
+  		//// touch system doesn't handle mousemouse events, so lets add
+  		//// in an event listener and use `Stage.locate` to highlight
+  		//// sprites on desktop.
+  		//Q.el.addEventListener('mousemove',function(e) {
+    	//	var x = e.offsetX || e.layerX,
+        //	y = e.offsetY || e.layerY,
+        //	stage = Q.stage();
+    	//	// Use the helper methods from the Input Module on Q to
+    	//	// translate from canvas to stage
+    	//	var stageX = Q.canvasToStageX(x, stage),
+        //	stageY = Q.canvasToStageY(y, stage);
+    	//	// Find the first object at that position on the stage
+    	//	var obj = stage.locate(stageX,stageY);
+    	//	// Set a `hit` property so the step method for the 
+    	//	// sprite can handle scale appropriately
+    	//	if(currentObj) { currentObj.p.over = false; }
+    	//	if(obj) {
+    	//	  currentObj = obj;
+    	//	  obj.p.over = true;
+    	//	}
+  		//});
+	//runner
+	var Q = window.Q = Quintus()
+        .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+        .setup({ maximize: true })
+        .controls().touch()
+	var SPRITE_BOX = 1;
+	var UiScores = document.getElementById("score");
+	//全局控制重力
+	Q.gravityY = 2000;
+	Q.Sprite.extend("Player",{
+  		init: function(p) {
+    		this._super(p,{
+      			sheet: "player",	//相当于asset
+      			sprite: "player1",  //动画
+      			collisionMask: SPRITE_BOX, //检测与type为SPRITE_BOX的对象的碰撞
+      			x: 40, //起始位置
+      			y: 555,
+      			//碰撞监测区域
+      			standingPoints: [ [ -16, 44], [ -23, 35 ], [-23,-48], [23,-48], [23, 35 ], [ 16, 44 ]],
+      			duckingPoints : [ [ -16, 44], [ -23, 35 ], [-23,-10], [23,-10], [23, 35 ], [ 16, 44 ]],
+      			speed: 500,
+      			jump: -1000
+    		});
+    		//碰撞边缘
+    		this.p.points = this.p.standingPoints;
+    		this.add("2d, animation");
+  		},
+  		step: function(dt) {
+  			//控制横向移动
+  			//console.log(this.p.landed,this.p.y);
+  			//?
+    		this.p.vx += (this.p.speed - this.p.vx)/4;
+    		//如果不控制就会下坠，因为加了2D模块
+    		if(this.p.y > 555) {
+      			this.p.y = 555;
+      			this.p.landed = 1;
+      			this.p.vy = 0;
+      			//console.log(this.p.vy,this.p.y);
+    		} else {
+    			//在空中
+      			this.p.landed = 0;
+      			//console.log(this.p.vy,this.p.y);
+    		}
+    		if(Q.inputs['up'] && this.p.landed > 0) {
+      			this.p.vy = this.p.jump;
+    		} 
+    		//?
+    		this.p.points = this.p.standingPoints;
+    		if(this.p.landed) {
+    	  		if(Q.inputs['down']) { 
+    	  			//play的参数是一个animation
+    	    		this.play("duck_right");
+    	    		this.p.points = this.p.duckingPoints;
+    	  		} else {
+    	    		this.play("walk_right");
+    	  		}
+    		} else {
+    	  		this.play("jump_right");
+    		}
+    		//将palyer固定在屏幕的一个位置上，player与底下是一体的？弄不明白
+    		this.stage.viewport.centerOn(this.p.x + 300, 400 );
+    		//console.log(Math.floor(Math.random() * 3));
+  		}
+	});
+	//box
+	Q.Sprite.extend("Box",{
+  		init: function() {
+    		var levels = [ 565, 540, 500, 400 ];
+    		//获取player
+    		var player = Q("Player").first();
+    		this._super({
+    			//必须相对player
+    		  x: player.p.x + Q.width + 50,
+    		  y: levels[Math.floor(Math.random() * 3)],
+    		  //选择哪一帧动画，2帧
+    		  frame: Math.random() < 0.5 ? 1 : 0,
+    		  //放大
+    		  scale: 2,
+    		  type: SPRITE_BOX,
+    		  sheet: "crates",
+    		  //?
+    		  vx: -600 + 200 * Math.random(),  //(-400~-600)
+    		  vy: 0,
+    		  ay: 0,
+    		  //变量
+    		  theta: (300 * Math.random() + 200) * (Math.random() < 0.5 ? 1 : -1),
+    		  player_pos:player.p.x
+    		});
+    		this.on("hit");
+  		},
+  		step: function(dt) {
+  		  this.p.x += this.p.vx * dt;
+  		  //主要是撞击之后
+  		  this.p.vy += this.p.ay * dt;
+  		  this.p.y += this.p.vy * dt;
+  		  //不是贴地滑行
+  		  if(this.p.y != 565) {
+  		    this.p.angle += this.p.theta * dt;
+  		  }
+  		  //落到画布之外，销毁
+  		  if(this.p.y > 800) { this.destroy(); }
+  		  console.log(this.p.x,Q("Player").first().p.x);
+  		  if(this.p.x < this.p.player_pos && this.p.x > this.p.player_pos-500* dt){Q.state.set({"score":Q.state.get("score")+1});}
+  		},
+  		//hit事件
+  		hit: function() {
+    		this.p.type = 0;
+    		//碰撞之后便不再能够碰撞
+    		//this.p.collisionMask = Q.SPRITE_NONE;
+    		this.p.type = Q.SPRITE_NONE;
+    		this.p.vx = 200;
+    		this.p.ay = 400;
+    		this.p.vy = -300;
+    		//透明度
+    		this.p.opacity = 0.5;
+    		//碰撞之后游戏结束
+    		Q.stageScene("gameover",2,{label:"Game Over!"});
+    		Q("Player").first().destroy();
+  		}
+	});
+	//投掷球
+	Q.GameObject.extend("BoxThrower",{
+	  init: function() {
+	    this.p = {
+	      launchDelay: 0.75,
+	      launchRandom: 1,
+	      launch: 2
+	    }
+	  },
+	  update: function(dt) {
+	    this.p.launch -= dt;
+	    //console.log(this.p.launch);
+	    if(this.p.launch < 0) {
+	      this.stage.insert(new Q.Box());
+	      this.p.launch = this.p.launchDelay + this.p.launchRandom * Math.random();
+	    }
+	  }
+	});
+	//开始游戏
+	Q.scene("level1",function(stage) {
+  		stage.insert(new Q.Repeater({ asset: "background-wall.png",
+                                speedX: 0.5 }));
+  		//x，y决定放置的位置
+  		stage.insert(new Q.Repeater({ asset: "background-floor.png",
+                                repeatY: false,
+                                repeatX: true,
+                                //视差，与player的相对速度
+                                speedX: 1,
+                                y: 300 }));
+  		stage.insert(new Q.BoxThrower());
+  		stage.insert(new Q.Player());
+  		//前面使用了viewport固定player
+  		stage.add("viewport");
+  		Q.stageScene("ui",1);
+	});
+	//游戏结束
+	Q.scene("gameover",function(stage){
+		var container = stage.insert(new Q.UI.Container({
+			x:Q.width/2,y:Q.height/2,fill:"rgba(0,0,0,0.5)"
+		}));
+		var button = container.insert(new Q.UI.Button({
+			x:0,y:0,fill:"#CCCCCC",label:"Play Again"
+		}));
+		var label = container.insert(new Q.UI.Text({
+			x:0,y:-10-button.p.h,label:stage.options.label
+		}));
+		button.on("click",function(){
+			Q.clearStages();
+			Q.stageScene('level1');
+		});
+		container.fit(20);
+	});
+	Q.scene('ui',function(stage){
+		UiScores.innerHTML = "Scores: " + Q.state.get("score");
+		Q.state.on("change.score",this,function(){
+			UiScores.innerHTML = "Scores: "+ Q.state.get("score");
+		});
+	});
+	Q.load("player.png, background-wall.png, background-floor.png, crates.png", function() {
+		//start the sprites at x=0 y=1 cols
+    	Q.sheet("player","player.png",{sx:0,sy:1,cols:18,tilew:72,tileh:97,frames:18});
+    	Q.sheet("crates","crates.png",{sx:0,sy:0,cols:2,tilew:32,tileh:32,frames:2});
+    	Q.animations("player1", {
+      		walk_right: { frames: [0,1,2,3,4,5,6,7,8,9,10], rate: 1/15, flip: false, loop: true },
+      		jump_right: { frames: [13], rate: 1/10, flip: false },
+      		stand_right: { frames:[14], rate: 1/10, flip: false },
+      		duck_right: { frames: [15], rate: 1/10, flip: false },
+    	});
+    	Q.state.reset({score:0});
+    	Q.stageScene("level1");
+    	Q.debug = true;
+	});
+});
+	</script>
+</body>
+</html>

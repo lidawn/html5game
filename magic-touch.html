@@ -1,0 +1,70 @@
+<html>
+<head>
+<script src="quintus-all.js"></script>
+<style type="text/css">
+	canvas {background-color:white;}
+    </style>
+</head>
+<body>
+	<script type="text/javascript">
+		window.addEventListener("load",function(){
+			var Q = window.Q = new Quintus()
+			.include("Sprites,2D,Scenes,Anim")
+			.setup({maximize:true})
+			.controls().touch();
+			//盒子
+			Q.Sprite.extend("box",{
+				init:function(p){
+					this._super({
+						x:10,
+						y:10,
+						sheet:"box",
+						vx:0,
+						vy:100,
+						frame:1,
+						life:1
+					});	
+				},
+				step:function(dt){
+					this.p.y += vy*dt;
+				}
+			});
+			//气球
+			Q.Sprite.extend("box",{
+				init:function(p){
+					this._super({
+						x:10,
+						y:10,
+						sheet:"box",
+						vx:0,
+						vy:100,
+						frame:1,
+						life:1
+					});	
+				},
+				step:function(dt){
+					this.p.y += vy*dt;
+				}
+			});
+			//盒子生成器
+			Q.GameObject.extend("boxgenerator",{
+				init:function(p){
+
+				},
+				update:function(dt){
+
+				}
+			});
+
+			//游戏场景
+			Q.scene("start",function(stage){
+
+			});
+			//加载图形
+			Q.load("ball.png,box.png",function(){
+				Q.sheet("box","box.png",{sx:0,sy:0,cols:6,tilew:,tileh:frames:6});
+				Q.stageScene("start");
+			});
+		});
+</body>
+</html>

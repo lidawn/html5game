@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<!--
+/*************************************************************
+ * This script is developed by Arturs Sosins aka ar2rsawseen, http://webcodingeasy.com
+ * Feel free to distribute and modify code, but keep reference to its creator
+ *
+ * Gestures class provides a way to define and detect gestures. 
+ * You can define your own gestures, by providing array of points, 
+ * that defines shape and provide callback function for each shape.
+ *
+ * For more information, examples and online documentation visit: 
+ * http://webcodingeasy.com/JS-classes/Javascript-gesture-recognition
+**************************************************************/
+-->
+<html>
+<head>
+</head>
+<body>
+<h1 style='text-align: center;'>Try to draw line, square, rectangle, zigzag, triangle, equilateral triangle, check or circle.</h1>
+<h1 style='text-align: center;' id='result'>Result: </h1>
+<script type="text/javascript" src="./gestures.js" ></script>
+<script type="text/javascript">
+function callback(name)
+{
+	document.getElementById("result").innerHTML = "Result: " + name;
+}
+
+var gest = new gestures({
+	debug: true,
+	draw: true,
+	drawColor: "#000000",
+	drawWidth: 5,
+	autoTrack: true,
+	allowRotation: true,
+	inverseShape: true,
+	points: 33
+});
+
+gest.addGesture("H_line", [
+	{x: 0, y: 0},
+	{x: 100, y: 0}
+], callback);
+//不准
+//gest.addGesture("V_line", [
+//	{x: 0, y: 0},
+//	{x: 0, y: 100}
+//], callback);
+
+gest.addGesture("V",[
+	{x:0,y:0},
+	{x:50,y:100},
+	{x:100,y:0}
+	],callback);
+
+gest.addGesture("R_V",[
+	{x:0,y:100},
+	{x:50,y:0},
+	{x:100,y:100}
+	],callback);
+
+gest.addGesture("WWW",[
+	{x:0,y:0},
+	{x:50,y:100},
+	{x:100,y:0},
+	{x:150,y:100},
+	{x:200,y:0},
+	{x:250,y:100},
+	{x:300,y:0}
+	],callback);
+
+gest.addGesture("Flash",[
+	{x:100,y:0},
+	{x:0,y:100},
+	{x:100,y:100},
+	{x:0,y:200}
+	],callback);
+
+gest.addGesture("ZZZ", [
+	{x: 0, y: 0},
+	{x: 100, y: 0},
+	{x: 0, y: 100},
+	{x: 100, y: 100}
+], callback);
+
+var x = 0;
+var y = -50;
+var circle_1 = [];
+//半圆
+var totalPoints = 72;
+var step = Math.PI/totalPoints;
+
+circle_1.push({x:0,y:100});
+circle_1.push({x:0,y:-100});
+x = 0;
+y = -50;
+var R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(2*Math.PI-angle*step);
+	var newY = y - R*Math.cos(2*Math.PI-angle*step);
+	var point = {x: newX, y: newY};
+	circle_1.push(point);
+}
+circle_1.push({x:80,y:0});
+x = 80;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step);
+	var point = {x: newX, y: newY};
+	circle_1.push(point);
+}
+circle_1.push({x:0,y:100});
+gest.addGesture("Circle_1", circle_1, callback);
+
+
+var circle_2 = [];
+//1/4圆
+totalPoints = totalPoints/2;
+step = Math.PI/(totalPoints*2);
+circle_2.push({x:-50,y:-50});
+x = 0;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	circle_2.push(point);
+}
+
+x = 0;
+y = 50;
+R = 50;
+//圆
+totalPoints = totalPoints*4;
+step = Math.PI*2/totalPoints;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step-Math.PI);
+	var point = {x: newX, y: newY};
+	circle_2.push(point);
+}
+
+//x = 0;
+//y = -50;
+//R = 50;
+//1/4圆
+//totalPoints = totalPoints/4;
+//step = Math.PI/(totalPoints*2);
+//for(var angle = 1; angle < totalPoints; angle++)
+//{
+//	var newX = R*Math.sin(angle*step);
+//	var newY = y + R*Math.cos(angle*step-Math.PI);
+//	var point = {x: newX, y: newY};
+//	circle_2.push(point);
+//}
+circle_2.push({x:50,y:-50});
+gest.addGesture("Circle_2", circle_2, callback);
+
+gest.addGesture("MMM", [
+	{x: 0, y: 100},
+	{x: 55, y: 0},
+	{x: 90, y: 80},
+	{x: 125, y: 0},
+	{x: 160, y: 100},
+], callback);
+
+var omiga = []
+omiga.push({x:-152,y:0});
+omiga.push({x:-72,y:0});
+x = 0;
+y = -40;
+R = 80;
+totalPoints = 192;
+step = Math.PI*2/(totalPoints*3);
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(angle*step-2/(3*Math.PI));
+	var newY = y - R*Math.cos(angle*step-2/(3*Math.PI));
+	var point = {x: newX, y: newY};
+	omiga.push(point);
+}
+omiga.push({x:152,y:0});
+gest.addGesture("Omiga", omiga, callback);
+
+var circle_3 = [];
+//半圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+
+circle_3.push({x:-100,y:0});
+circle_3.push({x:0,y:0});
+x = 0;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step);
+	var point = {x: newX, y: newY};
+	circle_3.push(point);
+}
+circle_3.push({x:0,y:180});
+x = 0;
+y = 130;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(2*Math.PI-angle*step);
+	var newY = y - R*Math.cos(2*Math.PI-angle*step);
+	var point = {x: newX, y: newY};
+	circle_3.push(point);
+}
+circle_3.push({x:100,y:80});
+gest.addGesture("Circle_3", circle_3, callback);
+
+var love = [];
+//1/4圆
+totalPoints = 72/2;
+step = Math.PI/(totalPoints*2);
+
+love.push({x:0,y:100});
+//x = 0;
+//y = 0;
+//R = 100;
+//for(var angle = 1; angle < totalPoints; angle++)
+//{
+//	var newX = R*Math.sin(angle*step+Math.PI);
+//	var newY = R*Math.cos(angle*step+Math.PI);
+//	var point = {x: newX, y: newY};
+//	love.push(point);
+//}
+love.push({x:-100,y:0});
+//half圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+x = -50;
+y = 0;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	love.push(point);
+}
+//love.push({x:0,y:0});
+//half圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+x = 50;
+y = 0;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	love.push(point);
+}
+
+//love.push({x:100,y:0});
+//1/4圆
+//totalPoints = 72/2;
+//step = Math.PI/(totalPoints*2);
+//
+//x = 0;
+//y = 0;
+//R = 100;
+//for(var angle = 1; angle < totalPoints; angle++)
+//{
+//	var newX = R*Math.cos(angle*step);
+//	var newY = R*Math.sin(angle*step);
+//	var point = {x: newX, y: newY};
+//	love.push(point);
+//}
+love.push({x:0,y:100});
+gest.addGesture("Love", love, callback);
+</script>
+</body>
+</html>

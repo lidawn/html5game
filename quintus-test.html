@@ -11,7 +11,7 @@
 	-->
 	<span id="score">Scores: 0</span>
 	<script type="text/javascript">
-		window.addEventListener("load",function(){
+		
 			//ball
 			//var Q  = window.Q  = Quintus().include("Sprites").setup({maximize:"touch"});
 			//Q.MovingSprite.extend("Ball",{
@@ -228,6 +228,7 @@
     	//	  obj.p.over = true;
     	//	}
   		//});
+window.addEventListener("load",function(){
 	//runner
 	var Q = window.Q = Quintus()
         .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
@@ -252,7 +253,7 @@
       			jump: -1000
     		});
     		//碰撞边缘
-    		this.p.points = this.p.standingPoints;
+    		//this.p.points = this.p.standingPoints;
     		this.add("2d, animation");
   		},
   		step: function(dt) {
@@ -316,7 +317,7 @@
     		  theta: (300 * Math.random() + 200) * (Math.random() < 0.5 ? 1 : -1),
     		  player_pos:player.p.x
     		});
-    		this.on("hit");
+    		this.on("aaa");
   		},
   		step: function(dt) {
   		  this.p.x += this.p.vx * dt;
@@ -333,7 +334,7 @@
   		  if(this.p.x < this.p.player_pos && this.p.x > this.p.player_pos-500* dt){Q.state.set({"score":Q.state.get("score")+1});}
   		},
   		//hit事件
-  		hit: function() {
+  		aaa: function() {
     		this.p.type = 0;
     		//碰撞之后便不再能够碰撞
     		//this.p.collisionMask = Q.SPRITE_NONE;
@@ -359,7 +360,7 @@
 	  },
 	  update: function(dt) {
 	    this.p.launch -= dt;
-	    //console.log(this.p.launch);
+	    console.log(this.p.launch);
 	    if(this.p.launch < 0) {
 	      this.stage.insert(new Q.Box());
 	      this.p.launch = this.p.launchDelay + this.p.launchRandom * Math.random();
@@ -368,44 +369,44 @@
 	});
 	//开始游戏
 	Q.scene("level1",function(stage) {
-  		stage.insert(new Q.Repeater({ asset: "background-wall.png",
-                                speedX: 0.5 }));
+  		//stage.insert(new Q.Repeater({ asset: "background-wall.png",
+      //                          speedX: 0.5 }));
   		//x，y决定放置的位置
-  		stage.insert(new Q.Repeater({ asset: "background-floor.png",
-                                repeatY: false,
-                                repeatX: true,
-                                //视差，与player的相对速度
-                                speedX: 1,
-                                y: 300 }));
+  		//stage.insert(new Q.Repeater({ asset: "background-floor.png",
+      //                          repeatY: false,
+      //                          repeatX: true,
+      //                          //视差，与player的相对速度
+      //                          speedX: 1,
+      //                          y: 300 }));
   		stage.insert(new Q.BoxThrower());
   		stage.insert(new Q.Player());
   		//前面使用了viewport固定player
   		stage.add("viewport");
-  		Q.stageScene("ui",1);
+  		//Q.stageScene("ui",1);
 	});
 	//游戏结束
-	Q.scene("gameover",function(stage){
-		var container = stage.insert(new Q.UI.Container({
-			x:Q.width/2,y:Q.height/2,fill:"rgba(0,0,0,0.5)"
-		}));
-		var button = container.insert(new Q.UI.Button({
-			x:0,y:0,fill:"#CCCCCC",label:"Play Again"
-		}));
-		var label = container.insert(new Q.UI.Text({
-			x:0,y:-10-button.p.h,label:stage.options.label
-		}));
-		button.on("click",function(){
-			Q.clearStages();
-			Q.stageScene('level1');
-		});
-		container.fit(20);
-	});
-	Q.scene('ui',function(stage){
-		UiScores.innerHTML = "Scores: " + Q.state.get("score");
-		Q.state.on("change.score",this,function(){
-			UiScores.innerHTML = "Scores: "+ Q.state.get("score");
-		});
-	});
+	//Q.scene("gameover",function(stage){
+	//	var container = stage.insert(new Q.UI.Container({
+	//		x:Q.width/2,y:Q.height/2,fill:"rgba(0,0,0,0.5)"
+	//	}));
+	//	var button = container.insert(new Q.UI.Button({
+	//		x:0,y:0,fill:"#CCCCCC",label:"Play Again"
+	//	}));
+	//	var label = container.insert(new Q.UI.Text({
+	//		x:0,y:-10-button.p.h,label:stage.options.label
+	//	}));
+	//	button.on("click",function(){
+	//		Q.clearStages();
+	//		Q.stageScene('level1');
+	//	});
+	//	container.fit(20);
+	//});
+	//Q.scene('ui',function(stage){
+	//	UiScores.innerHTML = "Scores: " + Q.state.get("score");
+	//	Q.state.on("change.score",this,function(){
+	//		UiScores.innerHTML = "Scores: "+ Q.state.get("score");
+	//	});
+	//});
 	Q.load("player.png, background-wall.png, background-floor.png, crates.png", function() {
 		//start the sprites at x=0 y=1 cols
     	Q.sheet("player","player.png",{sx:0,sy:1,cols:18,tilew:72,tileh:97,frames:18});
@@ -416,7 +417,7 @@
       		stand_right: { frames:[14], rate: 1/10, flip: false },
       		duck_right: { frames: [15], rate: 1/10, flip: false },
     	});
-    	Q.state.reset({score:0});
+    	//Q.state.reset({score:0});
     	Q.stageScene("level1");
     	Q.debug = true;
 	});

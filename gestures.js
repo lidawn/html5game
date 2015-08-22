@@ -37,9 +37,11 @@ var gestures = function(config){
 			conf[opt] = config[opt];
 		}
 
-		if(document.getElementById("gestures_canvas"))
+		//if(document.getElementById("gestures_canvas"))
+		if(document.getElementById("quintus"))
 		{
-			ctx = document.getElementById("gestures_canvas").getContext("2d");
+			//ctx = document.getElementById("gestures_canvas").getContext("2d");
+			ctx = document.getElementById("quintus").getContext("2d");
 		}
 		else if(conf.draw)
 		{
@@ -51,6 +53,7 @@ var gestures = function(config){
 			canvas.style.top = "0px";
 			canvas.style.left = "0px";
 			canvas.id = "gestures_canvas";
+			//canvas.id = "quintus";
 			ctx = canvas.getContext("2d");
 			document.body.appendChild(canvas);
 		}

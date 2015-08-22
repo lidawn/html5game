@@ -2583,8 +2583,15 @@ Quintus["2D"] = function(Q) {
            return;
       }
 
-      var canvas = document.createElement('canvas'),
-          ctx = canvas.getContext('2d');
+      if(document.getElementById("quintus"))
+    {
+      //ctx = document.getElementById("gestures_canvas").getContext("2d");
+      ctx = document.getElementById("quintus").getContext("2d");
+    }else{
+        var canvas = document.createElement('canvas'),
+        ctx = canvas.getContext('2d');
+    }
+      
 
       canvas.width = p.blockW;
       canvas.height= p.blockH;

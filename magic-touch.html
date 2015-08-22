@@ -6,65 +6,308 @@
     </style>
 </head>
 <body>
+<div id="quintus_container" style="width: 1920px; margin: 0px auto; position: relative;"><canvas width="1920" height="950" id="quintus" tabindex="0" style="height: 950px; width: 1920px; position: relative; outline: 0px;"></canvas></div>
 	<script type="text/javascript">
 		window.addEventListener("load",function(){
 			var Q = window.Q = new Quintus()
-			.include("Sprites,2D,Scenes,Anim")
+			.include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
 			.setup({maximize:true})
 			.controls().touch();
-			//盒子
-			Q.Sprite.extend("box",{
-				init:function(p){
-					this._super({
-						x:10,
-						y:10,
-						sheet:"box",
-						vx:0,
-						vy:100,
-						frame:1,
-						life:1
-					});	
-				},
-				step:function(dt){
-					this.p.y += vy*dt;
-				}
-			});
 			//气球
-			Q.Sprite.extend("box",{
+			Q.Sprite.extend("Balloon",{
 				init:function(p){
-					this._super({
-						x:10,
-						y:10,
-						sheet:"box",
-						vx:0,
-						vy:100,
-						frame:1,
-						life:1
+					this._super(p,{
+						x:100+Math.floor(Math.random()*12)*100,
+						y:0,
+						sheet:"balloon",
+						sprite:"balloon",
+						frame:Math.floor(Math.random()*12),
+						points:[[-50,50],[-50,-50],[50,-50],[50,50]]
 					});	
+					this.add("2d,animation");
 				},
 				step:function(dt){
-					this.p.y += vy*dt;
+					this.p.vy = 10000*dt;
+					//this.on();
 				}
 			});
-			//盒子生成器
-			Q.GameObject.extend("boxgenerator",{
-				init:function(p){
-
+			//气球生成器
+			Q.GameObject.extend("BallGenerator",{
+				init:function(){
+					this.p = {
+						delay:2
+					}
 				},
 				update:function(dt){
-
+					this.p.delay -= dt;
+					//console.log(this.p.delay);
+					if(this.p.delay<0){
+						this.stage.insert(new Q.Balloon());
+						this.p.delay = 1.6;
+					}
 				}
 			});
 
 			//游戏场景
 			Q.scene("start",function(stage){
-
+				stage.insert(new Q.Balloon());
+				stage.insert(new Q.BallGenerator());
 			});
 			//加载图形
-			Q.load("ball.png,box.png",function(){
-				Q.sheet("box","box.png",{sx:0,sy:0,cols:6,tilew:,tileh:frames:6});
+			Q.load("balloon.png",function(){
+				Q.sheet("balloon","balloon.png",{sx:0,sy:1,cols:12,tilew:100,tileh:100,frames:12});
+				//Q.sheet("player","player.png",{sx:0,sy:1,cols:18,tilew:72,tileh:97,frames:18});
+				
 				Q.stageScene("start");
+				Q.debug=true;
 			});
 		});
+	</script>
+	<script type="text/javascript" src="./gestures.js" ></script>
+	<script type="text/javascript">
+function callback(name)
+{
+	console.log(name);
+}
+
+var gest = new gestures({
+	debug: true,
+	draw: true,
+	drawColor: "#000000",
+	drawWidth: 5,
+	autoTrack: true,
+	allowRotation: true,
+	inverseShape: true,
+	points: 33
+});
+
+gest.addGesture("H_line", [
+	{x: 0, y: 0},
+	{x: 100, y: 0}
+], callback);
+
+gest.addGesture("V",[
+	{x:0,y:0},
+	{x:50,y:100},
+	{x:100,y:0}
+	],callback);
+
+gest.addGesture("R_V",[
+	{x:0,y:100},
+	{x:50,y:0},
+	{x:100,y:100}
+	],callback);
+
+gest.addGesture("WWW",[
+	{x:0,y:0},
+	{x:50,y:100},
+	{x:100,y:0},
+	{x:150,y:100},
+	{x:200,y:0},
+	{x:250,y:100},
+	{x:300,y:0}
+	],callback);
+
+gest.addGesture("Flash",[
+	{x:100,y:0},
+	{x:0,y:100},
+	{x:100,y:100},
+	{x:0,y:200}
+	],callback);
+
+gest.addGesture("ZZZ", [
+	{x: 0, y: 0},
+	{x: 100, y: 0},
+	{x: 0, y: 100},
+	{x: 100, y: 100}
+], callback);
+
+var x = 0;
+var y = -50;
+var circle_1 = [];
+//半圆
+var totalPoints = 72;
+var step = Math.PI/totalPoints;
+
+circle_1.push({x:0,y:100});
+circle_1.push({x:0,y:-100});
+x = 0;
+y = -50;
+var R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(2*Math.PI-angle*step);
+	var newY = y - R*Math.cos(2*Math.PI-angle*step);
+	var point = {x: newX, y: newY};
+	circle_1.push(point);
+}
+circle_1.push({x:80,y:0});
+x = 80;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step);
+	var point = {x: newX, y: newY};
+	circle_1.push(point);
+}
+circle_1.push({x:0,y:100});
+gest.addGesture("Circle_1", circle_1, callback);
+
+
+var circle_2 = [];
+//1/4圆
+totalPoints = totalPoints/2;
+step = Math.PI/(totalPoints*2);
+circle_2.push({x:-50,y:-50});
+x = 0;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	circle_2.push(point);
+}
+
+x = 0;
+y = 50;
+R = 50;
+//圆
+totalPoints = totalPoints*4;
+step = Math.PI*2/totalPoints;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step-Math.PI);
+	var point = {x: newX, y: newY};
+	circle_2.push(point);
+}
+
+circle_2.push({x:50,y:-50});
+gest.addGesture("Circle_2", circle_2, callback);
+
+gest.addGesture("MMM", [
+	{x: 0, y: 100},
+	{x: 55, y: 0},
+	{x: 90, y: 80},
+	{x: 125, y: 0},
+	{x: 160, y: 100},
+], callback);
+
+var omiga = []
+omiga.push({x:-152,y:0});
+omiga.push({x:-72,y:0});
+x = 0;
+y = -40;
+R = 80;
+totalPoints = 192;
+step = Math.PI*2/(totalPoints*3);
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(angle*step-2/(3*Math.PI));
+	var newY = y - R*Math.cos(angle*step-2/(3*Math.PI));
+	var point = {x: newX, y: newY};
+	omiga.push(point);
+}
+omiga.push({x:152,y:0});
+gest.addGesture("Omiga", omiga, callback);
+
+var circle_3 = [];
+//半圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+
+circle_3.push({x:-100,y:0});
+circle_3.push({x:0,y:0});
+x = 0;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step);
+	var point = {x: newX, y: newY};
+	circle_3.push(point);
+}
+circle_3.push({x:0,y:180});
+x = 0;
+y = 130;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(2*Math.PI-angle*step);
+	var newY = y - R*Math.cos(2*Math.PI-angle*step);
+	var point = {x: newX, y: newY};
+	circle_3.push(point);
+}
+circle_3.push({x:100,y:80});
+gest.addGesture("Circle_3", circle_3, callback);
+
+var love = [];
+//1/4圆
+totalPoints = 72/2;
+step = Math.PI/(totalPoints*2);
+
+love.push({x:0,y:100});
+//x = 0;
+//y = 0;
+//R = 100;
+//for(var angle = 1; angle < totalPoints; angle++)
+//{
+//	var newX = R*Math.sin(angle*step+Math.PI);
+//	var newY = R*Math.cos(angle*step+Math.PI);
+//	var point = {x: newX, y: newY};
+//	love.push(point);
+//}
+love.push({x:-100,y:0});
+//half圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+x = -50;
+y = 0;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	love.push(point);
+}
+//love.push({x:0,y:0});
+//half圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+x = 50;
+y = 0;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	love.push(point);
+}
+
+//love.push({x:100,y:0});
+//1/4圆
+//totalPoints = 72/2;
+//step = Math.PI/(totalPoints*2);
+//
+//x = 0;
+//y = 0;
+//R = 100;
+//for(var angle = 1; angle < totalPoints; angle++)
+//{
+//	var newX = R*Math.cos(angle*step);
+//	var newY = R*Math.sin(angle*step);
+//	var point = {x: newX, y: newY};
+//	love.push(point);
+//}
+love.push({x:0,y:100});
+gest.addGesture("Love", love, callback);
+</script>
 </body>
 </html>

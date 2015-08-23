@@ -26,6 +26,7 @@ var gestures = function(config){
 	var ctx;
 	var tracking = false;
 	var ob = this;
+	//console.log(this);
 	
 	this.gestures = [];
 	this.points = [];
@@ -37,10 +38,19 @@ var gestures = function(config){
 			conf[opt] = config[opt];
 		}
 
-		if(document.getElementById("gestures_canvas"))
+		//if(document.getElementById("gestures_canvas"))
+		if(document.getElementById("quintus"))
 		{
-			ctx = document.getElementById("gestures_canvas").getContext("2d");
+			//ctx = document.getElementById("gestures_canvas").getContext("2d");
+			canvas = document.getElementById("quintus");
+			canvas.style.position = "absolute";
+			ctx = canvas.getContext("2d");
+			ctx.globalCompositeOperation = "lighter";
+			//console.log(canvas);
+			//console.log(ctx);
+
 		}
+		//if(document.getElementById("quintus_container"))console.log("get");
 		else if(conf.draw)
 		{
 			//create canvas for drawing
@@ -52,6 +62,8 @@ var gestures = function(config){
 			canvas.style.left = "0px";
 			canvas.id = "gestures_canvas";
 			ctx = canvas.getContext("2d");
+			console.log("create");
+
 			document.body.appendChild(canvas);
 		}
 		if(conf.autoTrack || conf.draw)
@@ -160,6 +172,7 @@ var gestures = function(config){
 	this.Move = function(event){
 		if(conf.draw)
 		{
+			//console.log(ctx);
 			ctx.beginPath();
 			ctx.moveTo(ctx.lastX, ctx.lastY);
 			ctx.lineTo(event.clientX, event.clientY);

@@ -1,0 +1,667 @@
+<html>
+<head>
+<script src="quintus-all.js"></script>
+<!--<script type="text/javascript" src="./gestures.js" ></script>-->
+<style type="text/css">
+	canvas {background-color:white;}
+    </style>
+</head>
+<body>
+	<script type="text/javascript">
+		window.addEventListener("load",function(){
+			var Q = window.Q = new Quintus()
+			.include("Sprites, Scenes,  2D, Anim,  UI")
+			.setup({maximize:true});
+			//.controls().touch();
+
+			//气球
+			Q.Sprite.extend("Balloon",{
+				init:function(p){
+					this._super(p,{
+						x:100+Math.floor(Math.random()*12)*100,
+						y:0,
+						sheet:"balloon",
+						sprite:"balloon",
+						frame:Math.floor(Math.random()*12),
+						points:[[-50,50],[-50,-50],[50,-50],[50,50]]
+					});	
+					this.add("2d,animation");
+				},
+				step:function(dt){
+					this.p.vy = 10000*dt;
+					//this.on();
+				}
+			});
+			//气球生成器
+			Q.GameObject.extend("BallGenerator",{
+				init:function(){
+					this.p = {
+						delay:2
+					}
+				},
+				update:function(dt){
+					this.p.delay -= dt;
+					//console.log(this.p.delay);
+					if(this.p.delay<0){
+						this.stage.insert(new Q.Balloon());
+						this.p.delay = 1.6;
+					}
+				}
+			});
+
+			//游戏场景
+			Q.scene("start",function(stage){
+				stage.insert(new Q.Balloon());
+				stage.insert(new Q.BallGenerator());
+			});
+
+			Q.Class.extend("gestures",{
+				init:function(){
+					var d;
+					var ctx;
+					//var tracking = false;
+					//var ob = this;
+					this.gestures = [];
+					this.points = [];
+					this.p = {
+						debug : true,
+						draw : true,
+						drawColor : "#000000",
+						drawWidth : 5,
+						autoTrack : true,
+						allowRotation : true,
+						inverseShape : true,
+						points : 33,
+						tracking:false
+					}
+					
+				},
+
+				construct : function(){
+					//this.ob = this;
+					console.log(this);
+					this.d = this.doc_size();
+					//copying configuration
+					//for(var opt in this.config){
+					//	this.conf[opt] = this.config[opt];
+					//}
+					//console.log(this.conf);
+					//if(document.getElementById("gestures_canvas"))
+					if(document.getElementById("quintus"))
+					{
+						//ctx = document.getElementById("gestures_canvas").getContext("2d");
+						var canvas = document.getElementById("quintus");
+						canvas.style.position = "absolute";
+						this.ctx = canvas.getContext("2d");
+						this.ctx.globalCompositeOperation = "lighter";
+						//console.log(canvas);
+						//console.log(ctx);
+
+					}
+					//if(document.getElementById("quintus_container"))console.log("get");
+					else if(this.p.draw)
+					{
+						//create canvas for drawing
+						var canvas = document.createElement("canvas");
+						canvas.setAttribute("width", d.width + "px");
+						canvas.setAttribute("height", d.height + "px");
+						canvas.style.position = "absolute";
+						canvas.style.top = "0px";
+						canvas.style.left = "0px";
+						canvas.id = "gestures_canvas";
+						this.ctx = canvas.getContext("2d");
+						console.log("create");
+
+						document.body.appendChild(canvas);
+					}
+					if(this.p.autoTrack || this.p.draw)
+					{	console.log("test");
+						this.add_event(document.body, "mousedown", this.Down);
+						//this.add_event(document.body,"mousedown",);
+						this.add_event(document.body, "mouseup", this.Up);
+						this.p.tracking = true;
+					}
+		
+					this.reset();
+				},
+
+				pauseTracking : function(){
+					this.p.tracking = false;
+				},
+
+				resumeTracking : function(){
+					this.p.tracking = true;
+				},
+
+				addGesture:function(name,points,callback){
+					//console.log(this);
+					if(this.p.inverseShape){
+						var inverse = [];
+						//console.log(points.length);
+						for(var i = points.length-1; i >= 0; i--)
+						{
+							inverse.push(points[i]);
+						}
+						var gesture = {};
+						gesture.name = name;
+						gesture.callback = callback;
+						var map = this.resample(inverse, inverse.length);
+			
+						gesture.map = this.vectorize(map, this.p.allowRotation);
+						this.gestures.push(gesture);
+
+					}
+		
+					var gesture = {};
+					gesture.name = name;
+					gesture.callback = callback;
+					var map = this.resample(points, points.length);
+					gesture.map = this.vectorize(map, this.p.allowRotation);
+					this.gestures.push(gesture);
+				},
+
+				resolve : function(points){
+					if(points.length > 1)
+					{
+						this.reset();
+						var map = this.resample(points, points.length, conf);
+			
+						var ivect = this.vectorize(map, conf.allowRotation);
+			
+						var maxScore = 0;
+						var match = "none";
+						for(var i = 0; i < this.gestures.length; i++)
+						{
+							var dist = this.optCosDist(this.gestures[i].map, ivect);
+							var score = 1/dist;
+				
+							if(score > maxScore)
+							{
+								maxScore = score;
+								match = this.gestures[i];
+							}
+						}
+						if(match.callback)
+						{
+							match.callback(match.name);
+						}
+					}
+				},
+
+				reset : function(){
+					this.points = [];
+				},
+	
+				clear : function(){
+					this.ctx.clearRect(0, 0, d.width, d.height);
+				},
+
+				//gesture auto tracking
+				//mouse down
+				Down : function(event){
+					this.points = [];
+					console.log(event);
+					var canvas = document.getElementById("quintus");
+					canvas.style.position = "absolute";
+					var ctx = canvas.getContext("2d");
+					ctx.globalCompositeOperation = "lighter";
+					//ctx.clearRect(0, 0, d.width, d.height);
+					ctx.lineWidth = conf.drawWidth;
+					ctx.strokeStyle = conf.drawColor;
+					ctx.lastX = event.clientX;
+					ctx.lastY = event.clientY;
+
+
+						var point = {};
+						point.x = event.clientX;
+						point.y = event.clientY;
+						ob.points.push(point);
+
+					add_event(document.body, "mousemove", ob.Move);
+				},
+				
+				//mouse move
+				Move : function(event){
+					if(conf.draw)
+					{
+						console.log(ctx);
+						ctx.beginPath();
+						ctx.moveTo(ctx.lastX, ctx.lastY);
+						ctx.lineTo(event.clientX, event.clientY);
+						ctx.stroke();
+						ctx.lastX = event.clientX;
+						ctx.lastY = event.clientY;
+					}
+					if(conf.autoTrack && tracking)
+					{
+						var point = {};
+						point.x = event.clientX;
+						point.y = event.clientY;
+						ob.points.push(point);
+					}
+				},
+				//mouse up
+				Up : function(event){
+					if(conf.autoTrack && tracking)
+					{
+						ob.resolve(ob.points);
+					}
+					remove_event(document.body, "mousemove", ob.Move);
+				},
+
+				//some helping internal functions
+
+				optCosDist : function(gestureV, inputV){
+					var a = 0;
+					var b = 0;
+					
+					for(i = 0; i < gestureV.length; i += 2)
+					{
+						a = a + gestureV[i]*inputV[i] + gestureV[i+1]*inputV[i+1];
+						b = b + gestureV[i]*inputV[i+1] - gestureV[i+1]*inputV[i];
+					}
+					var angle = Math.atan2(b,a);
+					return Math.acos(a*Math.cos(angle) + b*Math.sin(angle));
+				},
+	
+				//distance [PROTRACTOR]
+				Distance : function(u, v){
+					var x = (u.x - v.x);
+					var y = (u.y - v.y);
+					return Math.sqrt((x*x)+(y*y));
+				},
+	
+				pathLength : function(points, n){
+					var distance = 0;
+					for(i = 1; i < n; i++)
+					{
+						distance = distance + this.Distance(points[i-1], points[i]);
+					}
+					return distance;
+				},
+				
+				resample : function(points, n){
+					var subLength = this.pathLength(points, n)/(this.points-1);
+					var distance = 0;
+					var newpoints = [];
+					var elem ={};
+					elem.x = points[0].x;
+					elem.y = points[0].y;
+					newpoints.push(elem);
+
+					var i = 1;
+					while (i < points.length && newpoints.length < (this.points-1))
+					{
+						var subdist = Distance(points[i-1], points[i]);
+						if((distance + subdist) >= subLength)
+						{
+							var elem2 = {};
+							elem2.x = points[i-1].x + ((subLength - distance)/subdist)*(points[i].x - points[i-1].x);
+							elem2.y = points[i-1].y + ((subLength - distance)/subdist)*(points[i].y - points[i-1].y);
+							//add point
+							newpoints.push(elem2);
+							points.splice(i,0,elem2);
+							distance = 0;
+						}
+						else
+						{
+							distance = distance + subdist;
+						}
+						i = i + 1;
+					}
+					var elem3 = {};
+					//adding last point
+					elem3.x = points[points.length-1].x;
+					elem3.y = points[points.length-1].y;
+					newpoints.push(elem3);
+		
+					return newpoints;
+				},
+	
+				centroid : function(points){
+					var center = {};
+					center.x = 0;
+					center.y = 0;
+					
+					for(i = 0; i < points.length; i++)
+					{
+						center.x = center.x + points[i].x;
+						center.y = center.y + points[i].y;
+					}
+					center.x = center.x/(points.length-1);
+					center.y = center.y/(points.length-1);
+					return center;
+				},
+	
+				translate : function(points,center){
+					for(var i = 0; i < points.length; i++)
+					{
+						points[i].x = points[i].x - center.x;
+						points[i].y = points[i].y - center.y;
+					}
+					return points;
+				},
+	
+				vectorize : function(points, sensit){
+					var vector = [];
+		
+					var center = this.centroid(points);
+					var points = this.translate(points, center);
+		
+					var lenkis = Math.atan2(points[1].x, points[1].y);
+					var delta = lenkis;
+					if(sensit)
+					{
+						var base = (Math.PI/4)*Math.floor((lenkis+(Math.PI/8))*(4/Math.PI));
+						delta = base-lenkis;
+					}
+					var summa = 0;
+					for(var i = 0; i < points.length; i++)
+					{
+						var newx = points[i].x*Math.cos(delta) - points[i].y*Math.sin(delta);
+						var newy = points[i].x*Math.sin(delta) + points[i].y*Math.cos(delta);
+						vector.push(newx);
+						vector.push(newy);
+						summa = summa + newx*newx + newy*newy;
+					}
+
+					var magnitude = Math.sqrt(summa);
+					for(var i = 0; i < vector.length; i++)
+					{
+						vector[i] = vector[i]/magnitude;
+					}
+					return vector;
+				},
+	
+				//get document dimensions
+				doc_size : function(){
+					var docsize = new Object();
+					docsize.width = 0;
+					docsize.height = 0;
+					docsize.width = Math.max(
+						Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
+						Math.max(document.body.offsetWidth, document.documentElement.offsetWidth),
+						Math.max(document.body.clientWidth, document.documentElement.clientWidth)
+					);
+					docsize.height = Math.max(
+						Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
+						Math.max(document.body.offsetHeight, document.documentElement.offsetHeight),
+						Math.max(document.body.clientHeight, document.documentElement.clientHeight)
+					);
+					return docsize;
+				},
+
+				//add event
+				add_event : function(element, type, listener){
+					console.log(element.addEventListener);
+					if(element.addEventListener)
+					{
+						//console.log("addEventListener");
+						console.log(this);
+						element.addEventListener(type, listener, false);
+					}
+					else
+					{
+						//console.log("attatchEventListener");
+						element.attachEvent('on' +  type, listener);
+					}
+				},
+	
+				//remove event
+				remove_event : function(element, type, listener){
+					if(element.removeEventListener)
+						element.removeEventListener(type, listener, false);
+					else
+						element.detachEvent('on' +  type, listener);
+				}
+			});
+			
+
+
+function callback(name)
+{
+	console.log(name);
+}
+
+var gest = new Q.gestures();
+gest.construct();
+
+gest.addGesture("H_line", [
+	{x: 0, y: 0},
+	{x: 100, y: 0}
+], callback);
+
+gest.addGesture("V",[
+	{x:0,y:0},
+	{x:50,y:100},
+	{x:100,y:0}
+	],callback);
+
+gest.addGesture("R_V",[
+	{x:0,y:100},
+	{x:50,y:0},
+	{x:100,y:100}
+	],callback);
+
+gest.addGesture("WWW",[
+	{x:0,y:0},
+	{x:50,y:100},
+	{x:100,y:0},
+	{x:150,y:100},
+	{x:200,y:0},
+	{x:250,y:100},
+	{x:300,y:0}
+	],callback);
+
+gest.addGesture("Flash",[
+	{x:100,y:0},
+	{x:0,y:100},
+	{x:100,y:100},
+	{x:0,y:200}
+	],callback);
+
+gest.addGesture("ZZZ", [
+	{x: 0, y: 0},
+	{x: 100, y: 0},
+	{x: 0, y: 100},
+	{x: 100, y: 100}
+], callback);
+
+var x = 0;
+var y = -50;
+var circle_1 = [];
+//半圆
+var totalPoints = 72;
+var step = Math.PI/totalPoints;
+
+circle_1.push({x:0,y:100});
+circle_1.push({x:0,y:-100});
+x = 0;
+y = -50;
+var R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(2*Math.PI-angle*step);
+	var newY = y - R*Math.cos(2*Math.PI-angle*step);
+	var point = {x: newX, y: newY};
+	circle_1.push(point);
+}
+circle_1.push({x:80,y:0});
+x = 80;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step);
+	var point = {x: newX, y: newY};
+	circle_1.push(point);
+}
+circle_1.push({x:0,y:100});
+gest.addGesture("Circle_1", circle_1, callback);
+
+
+var circle_2 = [];
+//1/4圆
+totalPoints = totalPoints/2;
+step = Math.PI/(totalPoints*2);
+circle_2.push({x:-50,y:-50});
+x = 0;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	circle_2.push(point);
+}
+
+x = 0;
+y = 50;
+R = 50;
+//圆
+totalPoints = totalPoints*4;
+step = Math.PI*2/totalPoints;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step-Math.PI);
+	var point = {x: newX, y: newY};
+	circle_2.push(point);
+}
+
+circle_2.push({x:50,y:-50});
+gest.addGesture("Circle_2", circle_2, callback);
+
+gest.addGesture("MMM", [
+	{x: 0, y: 100},
+	{x: 55, y: 0},
+	{x: 90, y: 80},
+	{x: 125, y: 0},
+	{x: 160, y: 100},
+], callback);
+
+var omiga = []
+omiga.push({x:-152,y:0});
+omiga.push({x:-72,y:0});
+x = 0;
+y = -40;
+R = 80;
+totalPoints = 192;
+step = Math.PI*2/(totalPoints*3);
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(angle*step-2/(3*Math.PI));
+	var newY = y - R*Math.cos(angle*step-2/(3*Math.PI));
+	var point = {x: newX, y: newY};
+	omiga.push(point);
+}
+omiga.push({x:152,y:0});
+gest.addGesture("Omiga", omiga, callback);
+
+var circle_3 = [];
+//半圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+
+circle_3.push({x:-100,y:0});
+circle_3.push({x:0,y:0});
+x = 0;
+y = -50;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.sin(angle*step);
+	var newY = y + R*Math.cos(angle*step);
+	var point = {x: newX, y: newY};
+	circle_3.push(point);
+}
+circle_3.push({x:0,y:180});
+x = 0;
+y = 130;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = R*Math.sin(2*Math.PI-angle*step);
+	var newY = y - R*Math.cos(2*Math.PI-angle*step);
+	var point = {x: newX, y: newY};
+	circle_3.push(point);
+}
+circle_3.push({x:100,y:80});
+gest.addGesture("Circle_3", circle_3, callback);
+
+var love = [];
+//1/4圆
+totalPoints = 72/2;
+step = Math.PI/(totalPoints*2);
+
+love.push({x:0,y:100});
+//x = 0;
+//y = 0;
+//R = 100;
+//for(var angle = 1; angle < totalPoints; angle++)
+//{
+//	var newX = R*Math.sin(angle*step+Math.PI);
+//	var newY = R*Math.cos(angle*step+Math.PI);
+//	var point = {x: newX, y: newY};
+//	love.push(point);
+//}
+love.push({x:-100,y:0});
+//half圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+x = -50;
+y = 0;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	love.push(point);
+}
+//love.push({x:0,y:0});
+//half圆
+totalPoints = 72;
+step = Math.PI/totalPoints;
+x = 50;
+y = 0;
+R = 50;
+for(var angle = 1; angle < totalPoints; angle++)
+{
+	var newX = x + R*Math.cos(angle*step - Math.PI);
+	var newY = y + R*Math.sin(angle*step);
+	var point = {x: newX, y: newY};
+	love.push(point);
+}
+
+//love.push({x:100,y:0});
+//1/4圆
+//totalPoints = 72/2;
+//step = Math.PI/(totalPoints*2);
+//
+//x = 0;
+//y = 0;
+//R = 100;
+//for(var angle = 1; angle < totalPoints; angle++)
+//{
+//	var newX = R*Math.cos(angle*step);
+//	var newY = R*Math.sin(angle*step);
+//	var point = {x: newX, y: newY};
+//	love.push(point);
+//}
+love.push({x:0,y:100});
+gest.addGesture("Love", love, callback);
+//加载图形
+			Q.load("balloon.png",function(){
+				Q.sheet("balloon","balloon.png",{sx:0,sy:1,cols:12,tilew:100,tileh:100,frames:12});
+				//Q.sheet("player","player.png",{sx:0,sy:1,cols:18,tilew:72,tileh:97,frames:18});
+
+Q.stageScene("start");
+				Q.debug=true;
+			});
+		});
+</script>
+</body>
+</html>

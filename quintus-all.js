@@ -2583,15 +2583,8 @@ Quintus["2D"] = function(Q) {
            return;
       }
 
-      if(document.getElementById("quintus"))
-    {
-      //ctx = document.getElementById("gestures_canvas").getContext("2d");
-      ctx = document.getElementById("quintus").getContext("2d");
-    }else{
-        var canvas = document.createElement('canvas'),
-        ctx = canvas.getContext('2d');
-    }
-      
+      var canvas = document.createElement('canvas'),
+          ctx = canvas.getContext('2d');
 
       canvas.width = p.blockW;
       canvas.height= p.blockH;
@@ -3127,10 +3120,10 @@ Quintus.Audio = function(Q) {
   Q.audio.enableHTML5Sound = function() {
     Q.audio.type = "HTML5";
 
-    for (var i=0;i<Q.audio.channelMax;i++) {	
+    for (var i=0;i<Q.audio.channelMax;i++) {  
       Q.audio.channels[i] = {};
       Q.audio.channels[i]['channel'] = new Audio(); 
-      Q.audio.channels[i]['finished'] = -1;	
+      Q.audio.channels[i]['finished'] = -1; 
     }
 
     // Play a single sound, optionally debounced 
@@ -3153,7 +3146,7 @@ Quintus.Audio = function(Q) {
       // Find a free audio channel and play the sound
       for (var i=0;i<Q.audio.channels.length;i++) {
         // Check the channel is either finished or not looping
-        if (!Q.audio.channels[i]['loop'] && Q.audio.channels[i]['finished'] < now) {	
+        if (!Q.audio.channels[i]['loop'] && Q.audio.channels[i]['finished'] < now) {  
 
           Q.audio.channels[i]['channel'].src = Q.asset(s).src;
 

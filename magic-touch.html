@@ -6,13 +6,12 @@
     </style>
 </head>
 <body>
-<div id="quintus_container" style="width: 1920px; margin: 0px auto; position: relative;"><canvas width="1920" height="950" id="quintus" tabindex="0" style="height: 950px; width: 1920px; position: relative; outline: 0px;"></canvas></div>
 	<script type="text/javascript">
 		window.addEventListener("load",function(){
 			var Q = window.Q = new Quintus()
-			.include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
-			.setup({maximize:true})
-			.controls().touch();
+			.include("Sprites, Scenes,  2D, Anim,  UI")
+			.setup({maximize:true});
+			//.controls().touch();
 			//气球
 			Q.Sprite.extend("Balloon",{
 				init:function(p){
@@ -73,7 +72,7 @@ function callback(name)
 var gest = new gestures({
 	debug: true,
 	draw: true,
-	drawColor: "#000000",
+	drawColor: "#000A00",
 	drawWidth: 5,
 	autoTrack: true,
 	allowRotation: true,

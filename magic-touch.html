@@ -1,11 +1,12 @@
 <html>
 <head>
 <script src="quintus-all.js"></script>
-<style type="text/css">
-	canvas {background-color:white;}
-    </style>
+<script src="./gestures.js" ></script>
+
 </head>
 <body>
+	<canvas width="1366" height="638" id="quintus" style="height: 638px; width: 1366px; position: relative;"></canvas>
+	<canvas width="1366px" height="643px" id="gestures_canvas" style="position: absolute; top: 0px; left: 0px;"></canvas>
 	<script type="text/javascript">
 		window.addEventListener("load",function(){
 			var Q = window.Q = new Quintus()
@@ -60,11 +61,7 @@
 				Q.stageScene("start");
 				Q.debug=true;
 			});
-		});
-	</script>
-	<script type="text/javascript" src="./gestures.js" ></script>
-	<script type="text/javascript">
-function callback(name)
+			function callback(name)
 {
 	console.log(name);
 }
@@ -307,6 +304,8 @@ for(var angle = 1; angle < totalPoints; angle++)
 //}
 love.push({x:0,y:100});
 gest.addGesture("Love", love, callback);
-</script>
+		});
+	</script>
+
 </body>
 </html>

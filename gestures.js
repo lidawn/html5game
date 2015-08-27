@@ -38,14 +38,14 @@ var gestures = function(config){
 			conf[opt] = config[opt];
 		}
 
-		//if(document.getElementById("gestures_canvas"))
-		if(document.getElementById("quintus"))
+		if(document.getElementById("gestures_canvas"))
+		//if(document.getElementById("quintus"))
 		{
-			//ctx = document.getElementById("gestures_canvas").getContext("2d");
-			canvas = document.getElementById("quintus");
-			canvas.style.position = "absolute";
-			ctx = canvas.getContext("2d");
-			ctx.globalCompositeOperation = "lighter";
+			ctx = document.getElementById("gestures_canvas").getContext("2d");
+			//canvas = document.getElementById("quintus");
+			//canvas.style.position = "absolute";
+			//ctx = canvas.getContext("2d");
+			//ctx.globalCompositeOperation = "lighter";
 			//console.log(canvas);
 			//console.log(ctx);
 

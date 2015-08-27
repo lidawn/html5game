@@ -1,0 +1,78 @@
+<html>
+<head>
+<script src="quintus-all.js"></script>
+<style type="text/css">
+	canvas {background-color:white;}
+    </style>
+</head>
+<body>
+	<script type="text/javascript">
+		window.addEventListener("load",function(){
+			var Q = window.Q = new Quintus()
+			.include("Sprites, Scenes,  2D, Anim,  UI")
+			.setup({maximize:true});
+
+			Q.Sprite.extend("Balloon",{
+				init:function(p){
+					this._super(p,{
+						x:100+Math.floor(Math.random()*12)*100,
+						y:200,
+						sheet:"balloon",
+						sprite:"balloon",
+						frame:Math.floor(Math.random()*12),
+						points:[[-50,50],[-50,-50],[50,-50],[50,50]]
+					});	
+				},
+			});
+
+			Q.scene("start",function(stage){
+				stage.insert(new Q.Balloon());
+			});
+
+			Q.load("balloon.png",function(){
+				Q.sheet("balloon","balloon.png",{sx:0,sy:1,cols:12,tilew:100,tileh:100,frames:12});
+				Q.stageScene("start");
+			});
+
+			var canvas = document.getElementById("quintus");
+			canvas.setAttribute("width",  "1920px");
+			canvas.setAttribute("height",  "555px");
+			canvas.style.position = "absolute";
+			canvas.style.top = "0px";
+			canvas.style.left = "0px";
+			var ctx = canvas.getContext("2d");
+			
+
+			var listener_move = function(event){
+				console.log(ctx);
+				ctx.lineWidth = 5;
+				ctx.strokeStyle = "#000000";
+				ctx.beginPath();
+				ctx.moveTo(ctx.lastX, ctx.lastY);
+				ctx.lineTo(event.clientX,event.clientY);
+				ctx.stroke();
+				ctx.lastX = event.clientX;
+				ctx.lastY = event.clientY;
+			};
+
+			var listener_down = function(event){
+				ctx.lineWidth = 5;
+				ctx.strokeStyle = "#000000";
+				ctx.lastX = event.clientX;
+				ctx.lastY = event.clientY;
+				document.body.addEventListener("mousemove",listener_move,false);
+			};
+
+			var listener_up = function(event){
+				document.body.removeEventListener("mousemove",listener_move,false);
+			};
+
+			document.body.addEventListener("mousedown",listener_down,false);
+
+			document.body.addEventListener("mouseup",listener_up,false);
+			
+				
+		});
+	</script>
+</body>
+</html>

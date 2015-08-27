@@ -1,0 +1,25 @@
+<html>
+<head></head>
+<body>
+
+	<canvas id="canvas-1" width="1920px" height="550px" style="position:absolute"></canvas>
+	<canvas id="canvas-2" width="1920px" height="550px" style="position:relative"></canvas>
+	<script type="text/javascript">
+		var c1  = document.getElementById("canvas-1");
+		var c2 = document.getElementById("canvas-2");
+		var ctx1 = c1.getContext("2d");
+		var ctx2 = c2.getContext("2d");
+		ctx1.beginPath();
+		ctx1.fillStyle="#000000";
+		ctx1.rect(20,20,150,160);
+		ctx1.fill();
+
+		ctx2.beginPath();
+		ctx2.fillStyle="#FF89a0";
+		ctx2.rect(20,20,150,160);
+		ctx2.fill();
+		console.log(ctx1);
+		console.log(ctx2);
+	</script>
+</body>
+</html>

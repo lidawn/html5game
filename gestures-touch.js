@@ -68,8 +68,8 @@ var gestures = function(config){
 		}
 		if(conf.autoTrack || conf.draw)
 		{
-			add_event(document.body, "mousedown", this.Down);
-			add_event(document.body, "mouseup", this.Up);
+			add_event(document.body, "touchstart", this.start);
+			add_event(document.body, "touchend", this.end);
 			tracking = true;
 		}
 		
@@ -148,54 +148,60 @@ var gestures = function(config){
 
 	//gesture auto tracking
 	//mouse down
-	this.Down = function(event){
+	this.start = function(event){
 		ob.reset();
+		event.preventDefault();
+		var touches = event.changedTouches;
+		//console.log(touches);
 		if(conf.draw)
 		{
 			ctx.clearRect(0, 0, d.width, d.height);
 			ctx.lineWidth = conf.drawWidth;
 			ctx.strokeStyle = conf.drawColor;
-			ctx.lastX = event.clientX;
-			ctx.lastY = event.clientY;
+			ctx.lastX = touches[0].pageX;
+			ctx.lastY = touches[0].pageY;
 		}
 		if(conf.autoTrack && tracking)
 		{
 			var point = {};
-			point.x = event.clientX;
-			point.y = event.clientY;
+			point.x = touches[0].pageX;
+			point.y = touches[0].pageY;
 			ob.points.push(point);
-			
 		}
-		add_event(document.body, "mousemove", ob.Move);
+		add_event(document.body, "touchmove", ob.Move);
 	};
 	
 	//mouse move
 	this.Move = function(event){
+		var touches = event.changedTouches;
+		//console.log(touches);
 		if(conf.draw)
 		{
-			//console.log(ctx);
 			ctx.beginPath();
 			ctx.moveTo(ctx.lastX, ctx.lastY);
-			ctx.lineTo(event.clientX, event.clientY);
+			ctx.lineTo(touches[0].pageX, touches[0].pageY);
 			ctx.stroke();
-			ctx.lastX = event.clientX;
-			ctx.lastY = event.clientY;
+			ctx.lastX = touches[0].pageX;
+			ctx.lastY = touches[0].pageY;
+			//console.log(event.changedTouches);
+			//console.log(event.pageX,event.pageY);
 		}
 		if(conf.autoTrack && tracking)
 		{
 			var point = {};
-			point.x = event.clientX;
-			point.y = event.clientY;
+			point.x = touches[0].pageX;
+			point.y = touches[0].pageY;
 			ob.points.push(point);
 		}
 	};
 	//mouse up
-	this.Up = function(event){
+	this.end = function(event){
 		if(conf.autoTrack && tracking)
 		{
 			ob.resolve(ob.points);
 		}
-		remove_event(document.body, "mousemove", ob.Move);
+		remove_event(document.body, "touchmove", ob.Move);
+		//console.log(points);
 	};
 
 

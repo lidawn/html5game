@@ -6,7 +6,7 @@
 </head>
 <body>
 	<canvas width="1366" height="638" id="quintus" style="height: 638px; width: 1366px; position: relative;"></canvas>
-	<canvas width="1366px" height="643px" id="gestures_canvas" style="position: absolute; top: 0px; left: 0px;"></canvas>
+	<canvas width="1366px" height="950px" id="gestures_canvas" style="position: absolute; top: 0px; left: 0px;"></canvas>
 	<script type="text/javascript">
 		window.addEventListener("load",function(){
 			var Q = window.Q = new Quintus()
@@ -14,6 +14,7 @@
 			.setup({maximize:true});
 			//.controls().touch();
 			//气球
+			gestures_defined = ["H_line","V","R_V","Circle_1","WWW","Circle_2","Omiga","Love","Flash","Circle_3","ZZZ","MMM"];
 			Q.Sprite.extend("Balloon",{
 				init:function(p){
 					this._super(p,{
@@ -22,13 +23,19 @@
 						sheet:"balloon",
 						sprite:"balloon",
 						frame:Math.floor(Math.random()*12),
+						gestures:"H_line",
 						points:[[-50,50],[-50,-50],[50,-50],[50,50]]
 					});	
 					this.add("2d,animation");
+					this.on("explode",function(){
+						this.play("explode");
+						//this.destroy();
+					});
 				},
 				step:function(dt){
 					this.p.vy = 10000*dt;
-					//this.on();
+					this.p.gestures = gestures_defined[this.p.frame];
+					if(this.p.y > 900)this.destroy();
 				}
 			});
 			//气球生成器
@@ -54,16 +61,41 @@
 				stage.insert(new Q.BallGenerator());
 			});
 			//加载图形
-			Q.load("balloon.png",function(){
-				Q.sheet("balloon","balloon.png",{sx:0,sy:1,cols:12,tilew:100,tileh:100,frames:12});
+			Q.load("ballonwithexplode.png",function(){
+				Q.sheet("balloon","ballonwithexplode.png",{sx:0,sy:1,cols:16,tilew:100,tileh:100,frames:16});
 				//Q.sheet("player","player.png",{sx:0,sy:1,cols:18,tilew:72,tileh:97,frames:18});
+				Q.animations("balloon",{
+					explode:{frames:[12,13,14,15],rate:1/4,flip:false,loop:false}
+				});
 				
 				Q.stageScene("start");
 				Q.debug=true;
+
+				
+				//// Call methodName on every sprite in the stage
+				////Q.stage().invoke("methodName",arg1,arg2);
+
+				//// Return the first sprite for which method returns truthy
+				//// var sprite = Q.stage().detect(method);
+				//// Return all instances of Q.Ball
+				//// var balls = Q("Ball");
+
+				//// Trigger a "shine" event on each ball
+				//// balls.trigger("shine"); 
+
+				//// Call the doSomething() method on each ball
+				//// balls.invoke("doSomething");
+				
 			});
 			function callback(name)
 {
-	console.log(name);
+	var balls = Q("Balloon");
+	//balls.trigger("explode");
+	balls.each(function(){
+		console.log(name);
+		if(this.p.gestures == name)this.trigger("explode");
+
+	})
 }
 
 var gest = new gestures({

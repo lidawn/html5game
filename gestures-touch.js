@@ -33,6 +33,7 @@ var gestures = function(config){
 	
 	this.construct = function(){
 		d = doc_size();
+		console.log(d);
 		//copying configuration
 		for(var opt in config){
 			conf[opt] = config[opt];
@@ -41,7 +42,12 @@ var gestures = function(config){
 		if(document.getElementById("gestures_canvas"))
 		//if(document.getElementById("quintus"))
 		{
-			ctx = document.getElementById("gestures_canvas").getContext("2d");
+			var canvas = document.getElementById("gestures_canvas");
+			canvas.setAttribute("width",document.documentElement.scrollWidth+"px");
+			canvas.setAttribute("height",document.documentElement.scrollHeight+"px");
+
+			var ctx = canvas.getContext("2d");
+
 			//canvas = document.getElementById("quintus");
 			//canvas.style.position = "absolute";
 			//ctx = canvas.getContext("2d");
@@ -55,8 +61,8 @@ var gestures = function(config){
 		{
 			//create canvas for drawing
 			var canvas = document.createElement("canvas");
-			canvas.setAttribute("width", d.width + "px");
-			canvas.setAttribute("height", d.height + "px");
+			//canvas.setAttribute("width", d.width + "px");
+			//canvas.setAttribute("height", d.height + "px");
 			canvas.style.position = "absolute";
 			canvas.style.top = "0px";
 			canvas.style.left = "0px";
@@ -335,6 +341,13 @@ var gestures = function(config){
 		var docsize = new Object();
 		docsize.width = 0;
 		docsize.height = 0;
+		//console.log("document.body.scrollWidth"+document.body.scrollWidth);
+		//console.log("document.documentElement.scrollWidth"+document.documentElement.scrollWidth);
+		//console.log("document.body.offsetWidth"+document.body.offsetWidth);
+		//console.log("document.documentElement.offsetWidth"+document.documentElement.offsetWidth);
+		//console.log("document.body.clientWidth"+document.body.clientWidth);
+		//console.log("document.documentElement.clientWidth"+document.documentElement.clientWidth);
+
 		docsize.width = Math.max(
 			Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
 			Math.max(document.body.offsetWidth, document.documentElement.offsetWidth),

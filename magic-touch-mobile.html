@@ -1,12 +1,17 @@
 <html>
 <head>
+<meta charset="utf-8">
 <script src="quintus-all.js"></script>
 <script src="gestures-touch.js" ></script>
+<script type="text/css">
+	html,body {height:100%;width:100%}
+	canvas {display:block;}
+</script>
 	
 </head>
 <body>
 	<canvas width="1366" height="638" id="quintus" style="height: 638px; width: 1366px; position: relative;"></canvas>
-	<canvas width="1366px" height="950px" id="gestures_canvas" style="position: absolute; top: 0px; left: 0px;"></canvas>
+	<canvas  width="1366" height="950" id="gestures_canvas" style=" position: absolute; top: 0px; left: 0px;"></canvas>
 	<script type="text/javascript">
 		window.addEventListener("load",function(){
 			var Q = window.Q = new Quintus()
@@ -15,27 +20,65 @@
 			//.controls().touch();
 			//气球
 			gestures_defined = ["H_line","V","R_V","Circle_1","WWW","Circle_2","Omiga","Love","Flash","Circle_3","ZZZ","MMM"];
+			width = document.documentElement.scrollWidth;
+			height = document.documentElement.scrollHeight;
+			limit = 3;
+			score = 0;
+			console.log(width/100-1);
+			console.log(height);
+
 			Q.Sprite.extend("Balloon",{
 				init:function(p){
 					this._super(p,{
-						x:100+Math.floor(Math.random()*12)*100,
+						x:80+Math.floor(Math.random()*(width/100-1.1))*100,
 						y:0,
 						sheet:"balloon",
 						sprite:"balloon",
 						frame:Math.floor(Math.random()*12),
 						gestures:"H_line",
-						points:[[-50,50],[-50,-50],[50,-50],[50,50]]
+						points:[[-50,50],[-50,-50],[50,-50],[50,50]],
+						status:"good",
+						type:1
 					});	
 					this.add("2d,animation");
 					this.on("explode",function(){
-						this.play("explode");
+						
 						//this.destroy();
+						this.p.status="success";
+						score+=1;
+					});
+					this.on("hit",function(){
+						limit-=1;
+						this.play("explode");
 					});
 				},
 				step:function(dt){
 					this.p.vy = 10000*dt;
 					this.p.gestures = gestures_defined[this.p.frame];
-					if(this.p.y > 900)this.destroy();
+					if(this.p.y > (height-50)&&this.p.status=="good"){
+						this.play("explode");
+						//limit -=1;
+						//console.log(limit);
+						//this.destroy();
+						this.p.status = "bad";
+					}
+					if(limit==0){
+						Q.stageScene("over",1);
+					}
+				}
+			});
+			//边界
+			Q.Sprite.extend("Boundry",{
+				init:function(p){
+					this._super(p,{
+						x:width/2,
+						y:height,
+						points:[[-width/2,1],[-width/2,-1],[width/2,-1],[width/2,1]],
+						collisionMask:1,
+						sheet:"boundry",
+						frame:0
+					});
+					console.log("hahahahahaha");
 				}
 			});
 			//气球生成器
@@ -47,11 +90,11 @@
 				},
 				update:function(dt){
 					this.p.delay -= dt;
-					//console.log(this.p.delay);
 					if(this.p.delay<0){
 						this.stage.insert(new Q.Balloon());
 						this.p.delay = 1.6;
 					}
+					
 				}
 			});
 
@@ -59,7 +102,43 @@
 			Q.scene("start",function(stage){
 				stage.insert(new Q.Balloon());
 				stage.insert(new Q.BallGenerator());
+				stage.insert(new Q.Boundry());
+				
 			});
+
+			//游戏结束
+			Q.scene("over",function(stage){
+				var container = stage.insert(new Q.UI.Container({
+					x:width/2,
+					y:height/2,
+					fill:"rgba(0,0,0,0.5)"
+				}));
+				var button_restart = container.insert(new Q.UI.Button({
+					x:0,
+					y:0,
+					fill:"#CCCCCC",
+					label:"再玩一次"
+				}));
+				var button_share = container.insert(new Q.UI.Button({
+					x:0,
+					y:50,
+					fill:"#CCCCCC",
+					label:"分享给朋友"
+				}));
+				var label = container.insert(new Q.UI.Text({
+					x:0,
+					y:-10 - button_restart.p.h,
+					
+					label:"你挂了！"
+				}));
+
+				button_restart.on("click",function(){
+					Q.clearStages();
+					//Q.stageScene('start');
+				});
+				container.fit(30);
+			});
+
 			//加载图形
 			Q.load("ballonwithexplode.png",function(){
 				Q.sheet("balloon","ballonwithexplode.png",{sx:0,sy:1,cols:16,tilew:100,tileh:100,frames:16});
@@ -67,9 +146,10 @@
 				Q.animations("balloon",{
 					explode:{frames:[12,13,14,15],rate:1/4,flip:false,loop:false}
 				});
+				Q.sheet("boundry","",{sx:0,sy:1,cols:1,tilew:100,tileh:100,frames:1});
 				
 				Q.stageScene("start");
-				//Q.debug=true;
+				Q.debug=true;
 
 				
 				//// Call methodName on every sprite in the stage
@@ -128,12 +208,12 @@ gest.addGesture("R_V",[
 
 gest.addGesture("WWW",[
 	{x:0,y:0},
-	{x:50,y:100},
-	{x:100,y:0},
-	{x:150,y:100},
-	{x:200,y:0},
-	{x:250,y:100},
-	{x:300,y:0}
+	{x:35,y:100},
+	{x:70,y:10},
+	{x:105,y:95},
+	{x:140,y:10},
+	{x:175,y:90},
+	{x:220,y:0}
 	],callback);
 
 gest.addGesture("Flash",[

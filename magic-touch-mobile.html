@@ -123,18 +123,20 @@
 				var button_restart = container.insert(new Q.UI.Button({
 					x:0,
 					y:0,
+					scale:2,
 					fill:"#CCCCCC",
 					label:"再玩一次"
 				}));
 				var button_share = container.insert(new Q.UI.Button({
 					x:0,
-					y:50,
+					y:100,
+					scale:2,
 					fill:"#CCCCCC",
 					label:"分享到朋友圈"
 				}));
 				var label = container.insert(new Q.UI.Text({
 					x:0,
-					y:-10 - button_restart.p.h,
+					y:-100 ,
 					
 					label:"你划破了 "+Q.state.get("score")+" 个气球！"
 				}));
@@ -174,7 +176,7 @@
 
 				});
 				
-				container.fit(30);
+				container.fit(100);
 			});
 
 			 Q.scene('ui', function(stage){
